@@ -13,11 +13,11 @@
     </v-card-text>
 
     <v-card-actions>
-      <v-btn color="purple" text>
+      <v-btn color="purple" text :disabled="noLoved(movie.id)" @click="addLovedMovie(movie)">
         Love it
       </v-btn>
       <v-spacer />
-      <v-btn color="orange" text>
+      <v-btn color="orange" :disabled="noWatchlist(movie.id)" text @click="addWatchlist(movie)">
         Watchlist
       </v-btn>
     </v-card-actions>
@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex'
+
 export default {
   name: 'MovieCard',
   props: {
@@ -42,6 +44,12 @@ export default {
       genres: [],
     }
   },
+  computed: {
+    ...mapGetters({
+      lovedMovies: 'getLovedMovies',
+      watchlist: 'getWatchlist',
+    }),
+  },
   created() {
     this.getGenres()
   },
@@ -50,6 +58,13 @@ export default {
       const genres = await this.$axios('genre/movie/list')
       this.genres = genres.data?.genres
     },
+    noLoved(movieId) {
+      return this.lovedMovies.find(movie => movie.id === movieId) ? true : false
+    },
+    noWatchlist(movieId) {
+      return this.watchlist.find(movie => movie.id === movieId) ? true : false
+    },
+    ...mapActions(['addLovedMovie', 'addWatchlist']),
   },
 }
 </script>
