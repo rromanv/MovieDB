@@ -1,15 +1,15 @@
 <template>
   <v-card>
-    <v-img class="white--text align-end" height="200px" src="https://cdn.vuetifyjs.com/images/cards/docks.jpg" />
-    <v-card-title>Movie Name</v-card-title>
+    <v-img class="white--text align-end" contain :src="`${imageURL}${movie.poster_path}`" />
+    <v-card-title>{{ movie.title }}</v-card-title>
     <v-card-subtitle class="pb-0">
-      <v-chip v-for="n in 3" :key="n" class="ma-2 purple--text text--darken-4" color="purple lighten-4" x-small>
-        Genre
+      <v-chip v-for="genre in movie.genre_ids" :key="genre" class="ma-2 purple--text text--darken-4" color="purple lighten-4" x-small>
+        {{ genres.find(g => g.id === genre).name }}
       </v-chip>
     </v-card-subtitle>
 
     <v-card-text class="text--primary">
-      Movie Description or Overview
+      {{ movie.overview }}
     </v-card-text>
 
     <v-card-actions>
@@ -27,5 +27,29 @@
 <script>
 export default {
   name: 'MovieCard',
+  props: {
+    movie: {
+      type: Object,
+      default: () => {},
+    },
+    imageURL: {
+      type: String,
+      default: '',
+    },
+  },
+  data() {
+    return {
+      genres: [],
+    }
+  },
+  created() {
+    this.getGenres()
+  },
+  methods: {
+    async getGenres() {
+      const genres = await this.$axios('genre/movie/list')
+      this.genres = genres.data?.genres
+    },
+  },
 }
 </script>
